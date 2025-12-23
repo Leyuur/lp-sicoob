@@ -12,7 +12,7 @@ function Home() {
       <Header />
       <main>
         <Inicio />
-        <ComoParticipar />
+        {/* <ComoParticipar /> */}
         <FAQ />
         <Ganhadores />
         <Regulamento />

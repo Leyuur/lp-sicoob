@@ -57,11 +57,11 @@ function Header() {
               <span>Início</span>
               <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#04c8b0] to-yellow-300 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
             </button>
-            <button onClick={() => scrollToSection('como-participar')} className="flex items-center gap-2 transition-all duration-300 font-semibold text-sm xl:text-base relative group text-white/90 hover:text-white">
+            {/* <button onClick={() => scrollToSection('como-participar')} className="flex items-center gap-2 transition-all duration-300 font-semibold text-sm xl:text-base relative group text-white/90 hover:text-white">
               <Settings size={18} className="group-hover:scale-110 transition-transform" /> 
               <span>Como Participar</span>
               <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#04c8b0] to-yellow-300 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
-            </button>
+            </button> */}
             <button onClick={() => scrollToSection('faq')} className="flex items-center gap-2 transition-all duration-300 font-semibold text-sm xl:text-base relative group text-white/90 hover:text-white">
               <HelpCircle size={18} className="group-hover:scale-110 transition-transform" /> 
               <span>FAQ</span>
