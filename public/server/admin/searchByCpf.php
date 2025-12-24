@@ -39,14 +39,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $result->fetch_assoc();
     $usuarioId = $user['id'];
 
-    // Buscar números da sorte
-    $stmt = $conn->prepare('SELECT numero FROM numeros WHERE usuario_id = ? ORDER BY created_at DESC');
+    // Buscar razão social
+    $stmt = $conn->prepare('SELECT razao_social FROM usuarios WHERE id = ?');
+    $stmt->bind_param('i', $usuarioId);
+    $stmt->execute();
+    $userResult = $stmt->get_result();
+    $userData = $userResult->fetch_assoc();
+
+    // Buscar números mensais
+    $stmt = $conn->prepare('SELECT numero, periodo_mes as tipo FROM numeros_mensais WHERE usuario_id = ? ORDER BY created_at DESC');
     $stmt->bind_param('i', $usuarioId);
     $stmt->execute();
     $numerosResult = $stmt->get_result();
     $numeros = [];
     while ($row = $numerosResult->fetch_assoc()) {
-        $numeros[] = $row['numero'];
+        $numeros[] = [
+            'numero' => $row['numero'],
+            'tipo' => $row['tipo']
+        ];
+    }
+
+    // Buscar números periódicos
+    $stmt = $conn->prepare('SELECT numero, periodo_tipo as tipo FROM numeros_periodicos WHERE usuario_id = ? ORDER BY created_at DESC');
+    $stmt->bind_param('i', $usuarioId);
+    $stmt->execute();
+    $numerosResult = $stmt->get_result();
+    while ($row = $numerosResult->fetch_assoc()) {
+        $numeros[] = [
+            'numero' => $row['numero'],
+            'tipo' => $row['tipo']
+        ];
     }
 
     // Buscar histórico de chaves de acesso
@@ -63,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'success' => true,
         'content' => [
             'cpf' => $user['cpf'],
+            'razao_social' => $userData['razao_social'],
             'numeros' => $numeros,
             'historico' => $historico
         ]

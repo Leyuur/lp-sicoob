@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Lock, User, LogIn, Shield } from 'lucide-react'
 import { toast } from 'react-toastify'
@@ -9,6 +9,19 @@ function AdminLogin() {
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({ username: false, password: false })
   const navigate = useNavigate()
+
+  // Verificar se já está logado
+  useEffect(() => {
+    const adminAuth = localStorage.getItem('adminAuth')
+    if (adminAuth) {
+      try {
+        JSON.parse(adminAuth)
+        navigate('/admin/panel')
+      } catch (error) {
+        localStorage.removeItem('adminAuth')
+      }
+    }
+  }, [navigate])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -91,7 +104,7 @@ function AdminLogin() {
                 Painel Administrativo
               </h3>
               <p className="text-gray-600 text-sm">
-                Gestão da Promoção Black Cassol
+                Gestão da Promoção Sicoob
               </p>
             </div>
             

@@ -24,7 +24,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router basename="/teste">
       <div className="min-h-screen">
         <ToastContainer
           position="top-right"
@@ -40,9 +40,9 @@ function App() {
           style={{ zIndex: 99999 }}
         />
         <Routes>
-          <Route path="/teste" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/consultar" element={<Consultar />} />
-          <Route path="/teste/admin" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/panel" element={<AdminPanel />} />
         </Routes>
       </div>

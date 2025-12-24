@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react'
+let icone = './icone.png'
+
+if(location.pathname.includes('/admin')) icone = '../icone.png'
 
 function Loading({ onComplete }) {
   const [progress, setProgress] = useState(0)
@@ -32,7 +35,7 @@ function Loading({ onComplete }) {
         <div className="mb-8 relative">
           <div className="w-24 h-24 mx-auto flex items-center justify-center">
             <img 
-              src="./icone.png" 
+              src={icone} 
               alt="Sicoob" 
               className="w-16 h-16 object-contain"
             />

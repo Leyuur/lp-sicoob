@@ -25,12 +25,12 @@ try {
             g.data_indicacao,
             g.indicado_por,
             g.status,
+            g.motivo_desclassificacao,
             u.cpf,
             COALESCE(u.razao_social, u.name) as nome,
             u.data_nascimento_abertura
         FROM ganhadores g
         INNER JOIN usuarios u ON g.usuario_id = u.id
-        WHERE g.status = "contemplado"
         ORDER BY g.data_indicacao DESC
     ');
     $stmt->execute();
@@ -50,51 +50,54 @@ try {
                 'outubro' => 'Outubro', 'novembro' => 'Novembro', 'dezembro' => 'Dezembro'
             ];
             $periodoFormatado = $meses[$row['periodo_referencia']] ?? ucfirst($row['periodo_referencia']);
+        } elseif ($row['tipo_sorteio'] === 'periodico') {
+            $categoria = 'Periódico';
+            $periodoFormatado = $row['periodo_referencia'] . 'º Período';
         } else {
-            // Determinar categoria dos periódicos
-            $periodico = $row['periodo_referencia'];
-            if (strpos($periodico, 'trimestre') !== false) {
-                $categoria = 'Trimestral';
-                $periodoFormatado = str_replace('trimestre_', '', $periodico) . 'º Trimestre';
-            } elseif ($periodico === 'semestral') {
-                $categoria = 'Semestral';
-                $periodoFormatado = 'Semestral';
-            } elseif ($periodico === 'anual') {
-                $categoria = 'Anual';
-                $periodoFormatado = 'Anual';
-            } else {
-                $periodoFormatado = ucfirst($periodico);
-            }
+            $categoria = ucfirst($row['tipo_sorteio']);
+            $periodoFormatado = $row['periodo_referencia'];
         }
-        
+
+        // Formatar número da sorte
+        $numeroFormatado = str_pad($row['numero'], 10, '0', STR_PAD_LEFT);
+        $numeroFormatado = substr($numeroFormatado, 0, 3) . '.' . 
+                          substr($numeroFormatado, 3, 3) . '.' . 
+                          substr($numeroFormatado, 6, 4);
+
         $winners[] = [
-            'id' => $row['id'],
-            'participantId' => $row['usuario_id'],
-            'numero_sorte' => $row['numero'],
-            'tipo_sorteio' => $row['tipo_sorteio'],
+            'id' => (int)$row['id'],
+            'usuario_id' => (int)$row['usuario_id'],
+            'nome' => $row['nome'],
+            'participantCpf' => $row['cpf'] ? 
+                substr($row['cpf'], 0, 3) . '.' . 
+                substr($row['cpf'], 3, 3) . '.' . 
+                substr($row['cpf'], 6, 3) . '-' . 
+                substr($row['cpf'], 9, 2) : 
+                'N/A',
+            'numero' => $row['numero'], // Número original sem formatação
+            'numero_sorte' => $numeroFormatado,
             'tipo_sorteio_formatado' => $categoria,
-            'periodo_referencia' => $row['periodo_referencia'],
             'periodo_formatado' => $periodoFormatado,
             'periodo_ano' => $row['periodo_ano'],
             'data_indicacao' => $row['data_indicacao'],
-            'premiadoPor' => $row['indicado_por'],
-            'nome' => $row['nome'],
-            'participantCpf' => $row['cpf']
+            'indicado_por' => $row['indicado_por'],
+            'status' => $row['status'],
+            'motivo_desclassificacao' => $row['motivo_desclassificacao']
         ];
     }
 
     echo json_encode([
         'success' => true,
-        'winners' => $winners
-    ]);
-
-    $stmt->close();
-    $conn->close();
+        'winners' => $winners,
+        'total' => count($winners)
+    ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
+    error_log("Erro ao buscar ganhadores: " . $e->getMessage());
+    http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => 'Erro ao buscar ganhadores: ' . $e->getMessage()
-    ]);
+        'message' => 'Erro ao buscar ganhadores'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

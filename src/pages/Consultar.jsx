@@ -8,7 +8,7 @@ function Consultar() {
       {/* Botão Voltar */}
       <div className="absolute top-6 left-6 z-50">
         <Link
-          to="/teste"
+          to="/"
           className="flex items-center gap-2 bg-white/20 backdrop-blur-md text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold hover:bg-white/30 border-2 border-white/30 hover:border-white/50 transition-all duration-300 shadow-xl hover:scale-105"
         >
           <ArrowLeft size={20} />

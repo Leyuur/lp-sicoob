@@ -2,7 +2,7 @@
 date_default_timezone_set('America/Sao_Paulo');
 
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
@@ -16,12 +16,21 @@ require_once '../db/config.php';
 try {
     $input = json_decode(file_get_contents('php://input'), true);
     $possibleWinnerId = isset($input['possibleWinnerId']) ? intval($input['possibleWinnerId']) : 0;
+    $motivo = isset($input['motivo']) ? trim($input['motivo']) : '';
     $premiadoPor = isset($input['premiadoPor']) ? trim($input['premiadoPor']) : 'admin';
 
     if (!$possibleWinnerId) {
         echo json_encode([
             'success' => false,
             'message' => 'ID do possível ganhador não fornecido'
+        ]);
+        exit;
+    }
+
+    if (empty($motivo)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Motivo da desclassificação é obrigatório'
         ]);
         exit;
     }
@@ -53,62 +62,22 @@ try {
     $winner = $result->fetch_assoc();
     $stmt->close();
 
-    // Determinar categoria do sorteio
-    $categoria = '';
-    if ($winner['tipo_sorteio'] === 'mensal') {
-        $categoria = 'mensal';
-    } else {
-        // Determinar categoria dos periódicos
-        $periodico = $winner['periodo_referencia'];
-        if (strpos($periodico, 'trimestre') !== false) {
-            $categoria = 'trimestral';
-        } elseif ($periodico === 'semestral') {
-            $categoria = 'semestral';
-        } elseif ($periodico === 'anual') {
-            $categoria = 'anual';
-        }
-    }
-
-    // Verificar se usuário já ganhou nesta categoria
-    $sqlCheck = "SELECT COUNT(*) as total FROM ganhadores g
-                 WHERE g.usuario_id = ?
-                 AND (
-                     (? = 'mensal' AND g.tipo_sorteio = 'mensal')
-                     OR (? = 'trimestral' AND g.periodo_referencia LIKE 'trimestre_%')
-                     OR (? = 'semestral' AND g.periodo_referencia = 'semestral')
-                     OR (? = 'anual' AND g.periodo_referencia = 'anual')
-                 )";
-    
-    $stmtCheck = $conn->prepare($sqlCheck);
-    $stmtCheck->bind_param("issss", $winner['usuario_id'], $categoria, $categoria, $categoria, $categoria);
-    $stmtCheck->execute();
-    $checkResult = $stmtCheck->get_result();
-    $checkData = $checkResult->fetch_assoc();
-    $stmtCheck->close();
-
-    if ($checkData['total'] > 0) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Este usuário já foi contemplado na categoria ' . $categoria . '. Cada pessoa pode ganhar no máximo 1x por categoria (mensal, trimestral, semestral, anual).'
-        ]);
-        exit;
-    }
-
-    // Inserir em ganhadores oficiais
+    // Inserir em ganhadores com status desclassificado
     $sqlInsert = "INSERT INTO ganhadores 
-                  (usuario_id, numero, tipo_sorteio, periodo_referencia, periodo_ano, data_indicacao, indicado_por, status) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, 'contemplado')";
+                  (usuario_id, numero, tipo_sorteio, periodo_referencia, periodo_ano, data_indicacao, indicado_por, status, motivo_desclassificacao) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, 'desclassificado', ?)";
     
     $stmtInsert = $conn->prepare($sqlInsert);
     $stmtInsert->bind_param(
-        "issssss",
+        "isssssss",
         $winner['usuario_id'],
         $winner['numero'],
         $winner['tipo_sorteio'],
         $winner['periodo_referencia'],
         $winner['periodo_ano'],
         $winner['data_indicacao'],
-        $premiadoPor
+        $premiadoPor,
+        $motivo
     );
     
     if ($stmtInsert->execute()) {
@@ -121,18 +90,18 @@ try {
         
         echo json_encode([
             'success' => true,
-            'message' => 'Contemplado confirmado com sucesso!'
+            'message' => 'Contemplado desclassificado com sucesso!'
         ]);
     } else {
         if ($conn->errno === 1062) {
             echo json_encode([
                 'success' => false,
-                'message' => 'Este número já está registrado como contemplado'
+                'message' => 'Este número já está registrado'
             ]);
         } else {
             echo json_encode([
                 'success' => false,
-                'message' => 'Erro ao confirmar: ' . $conn->error
+                'message' => 'Erro ao desclassificar: ' . $conn->error
             ]);
         }
     }

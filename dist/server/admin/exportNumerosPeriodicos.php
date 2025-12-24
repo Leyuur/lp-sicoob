@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql = "SELECT 
             n.numero,
             u.cpf,
+            COALESCE(u.razao_social, u.name) as razao_social,
             n.periodo_tipo,
             n.periodo_ano,
             n.created_at,
@@ -61,9 +62,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $numeros = [];
         while ($row = $result->fetch_assoc()) {
+            // Formatar número 000/00000
+            $parts = explode('/', $row['numero']);
+            $numeroFormatado = str_pad($parts[0], 3, '0', STR_PAD_LEFT) . '/' . str_pad($parts[1], 5, '0', STR_PAD_LEFT);
+            
             $numeros[] = [
-                'numero' => $row['numero'],
+                'numero' => $numeroFormatado,
                 'cpf' => $row['cpf'],
+                'razao_social' => $row['razao_social'],
                 'periodo_tipo' => $row['periodo_tipo'],
                 'periodo_ano' => $row['periodo_ano'],
                 'created_at' => $row['created_at'],

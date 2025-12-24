@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('America/Sao_Paulo');
+
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
@@ -12,7 +14,8 @@ header('Content-Type: application/json; charset=utf-8');
 function gerarNumeroSorteUnico($conn, $tipoSorteio, $periodoReferencia, $periodoAno) {
     $tentativas = 0;
     do {
-        $serie = rand(0, 9);
+        // Gerar série com 3 dígitos (000-999) e sequência com 5 dígitos (00000-99999)
+        $serie = str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
         $sequencia = str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
         $numero = $serie . '/' . $sequencia;
         
@@ -309,13 +312,10 @@ try {
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            // Usuário existe - atualiza informações
+            // Usuário já existe - mantém os dados originais (nome e data), não sobrescreve
             $usuario = $result->fetch_assoc();
             $usuarioId = $usuario['id'];
-
-            $stmt = $conn->prepare('UPDATE usuarios SET name = ?, data_nascimento_abertura = ?, razao_social = ? WHERE id = ?');
-            $stmt->bind_param('sssi', $nomeRazaoSocial, $dataMySQL, $nomeRazaoSocial, $usuarioId);
-            $stmt->execute();
+            // NÃO faz UPDATE - preserva os dados da primeira vez que foi cadastrado
         } else {
             // Cria novo usuário
             $stmt = $conn->prepare('INSERT INTO usuarios (cpf, name, data_nascimento_abertura, razao_social, data_nascimento) VALUES (?, ?, ?, ?, ?)');
@@ -355,13 +355,15 @@ try {
         INSERT INTO upload_logs 
         (uploaded_by, tipo_sorteio, periodo_referencia, periodo_ano, total_lines, processed_lines, error_count, 
          numbers_generated, users_affected, affected_users, status, message) 
-        VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, "success", ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ');
     $usersAffected = count(array_unique($cpfsAfetados));
     $affectedUsersJson = json_encode(array_unique($cpfsAfetados));
     $mensagem = "Upload concluído com sucesso. Tipo: {$tipoSorteio}, Período: {$periodoReferencia}/{$periodoAno}";
-    $stmt->bind_param('sssiiiiss', $uploadedBy, $tipoSorteio, $periodoReferencia, $periodoAno, 
-                      $totalLinhas, $linhasProcessadas, $numerosGerados, $usersAffected, $affectedUsersJson, $mensagem);
+    $errorCount = 0;
+    $status = "success";
+    $stmt->bind_param('sssiiiiiisss', $uploadedBy, $tipoSorteio, $periodoReferencia, $periodoAno, 
+                      $totalLinhas, $linhasProcessadas, $errorCount, $numerosGerados, $usersAffected, $affectedUsersJson, $status, $mensagem);
     $stmt->execute();
 
     $conn->commit();

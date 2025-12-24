@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('America/Sao_Paulo');
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -12,3 +14,6 @@ if ($conn->connect_errno) {
 	die('Erro ao conectar ao banco de dados: ' . $conn->connect_error);
 }
 $conn->set_charset('utf8mb4');
+
+// Definir timezone do MySQL para São Paulo
+$conn->query("SET time_zone = '-03:00'");

@@ -73,13 +73,16 @@ function ConsultaNumeros() {
     setLoading(true)
     
     try {
+      // Remover máscara do CPF/CNPJ antes de enviar
+      const cpfCnpjSemMascara = cpfCnpj.replace(/\D/g, '')
+      
       const response = await fetch('/server/auth/login.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          cpf: cpfCnpj,
+          cpf: cpfCnpjSemMascara,
           data_nascimento: dataNascimento
         })
       })

@@ -6,8 +6,11 @@
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   
-  # Redireciona tudo para index.html
-  RewriteRule ^(.*)$ /teste/index.html [L]
+  # Não redirecionar requisições de API/PHP
+  RewriteCond %{REQUEST_URI} !^/teste/server/
+  
+  # Redireciona tudo para index.html (para SPA React Router funcionar)
+  RewriteRule ^(.*)$ /teste/index.html [L,QSA]
 </IfModule>
 
 # Cache control para assets

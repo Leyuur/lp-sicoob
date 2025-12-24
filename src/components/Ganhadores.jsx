@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Trophy, Calendar, User, Loader2, AlertCircle } from 'lucide-react'
+import { Trophy, Calendar, User, Loader2, AlertCircle, Award } from 'lucide-react'
 
 function Ganhadores() {
   const [ganhadores, setGanhadores] = useState([])
@@ -121,6 +121,12 @@ function Ganhadores() {
                     </th>
                     <th className="px-4 lg:px-6 py-4 lg:py-5 text-left">
                       <div className="flex items-center gap-2 text-white font-bold text-xs lg:text-sm uppercase tracking-wide">
+                        <Award size={16} className="lg:w-[18px] lg:h-[18px]" />
+                        Tipo de Sorteio
+                      </div>
+                    </th>
+                    <th className="px-4 lg:px-6 py-4 lg:py-5 text-left">
+                      <div className="flex items-center gap-2 text-white font-bold text-xs lg:text-sm uppercase tracking-wide">
                         <Calendar size={16} className="lg:w-[18px] lg:h-[18px]" />
                         Data do Sorteio
                       </div>
@@ -145,8 +151,18 @@ function Ganhadores() {
                         </span>
                       </td>
                       <td className="px-4 lg:px-6 py-4 lg:py-5">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-gray-800 font-semibold text-sm lg:text-base">
+                            {ganhador.tipo_sorteio_formatado || '-'}
+                          </span>
+                          <span className="text-gray-600 text-xs lg:text-sm">
+                            {ganhador.periodo_formatado} / {ganhador.periodo_ano}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 lg:px-6 py-4 lg:py-5">
                         <span className="text-gray-700 font-medium text-sm lg:text-base">
-                          {formatDate(ganhador.data_sorteio)}
+                          {formatDate(ganhador.data_indicacao)}
                         </span>
                       </td>
                     </tr>
@@ -181,11 +197,23 @@ function Ganhadores() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2 text-gray-500 text-xs sm:text-sm font-medium mb-1">
+                        <Award size={14} className="sm:w-4 sm:h-4" />
+                        Tipo de Sorteio
+                      </div>
+                      <div className="text-gray-800 font-semibold text-sm sm:text-base">
+                        {ganhador.tipo_sorteio_formatado || '-'}
+                      </div>
+                      <div className="text-gray-600 text-xs sm:text-sm mt-1">
+                        {ganhador.periodo_formatado} / {ganhador.periodo_ano}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 text-gray-500 text-xs sm:text-sm font-medium mb-1">
                         <Calendar size={14} className="sm:w-4 sm:h-4" />
                         Data do Sorteio
                       </div>
                       <div className="text-gray-700 font-medium text-sm sm:text-base">
-                        {formatDate(ganhador.data_sorteio)}
+                        {formatDate(ganhador.data_indicacao)}
                       </div>
                     </div>
                   </div>

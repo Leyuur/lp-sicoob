@@ -1,35 +1,60 @@
 <?php
 date_default_timezone_set('America/Sao_Paulo');
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 1);
-include_once __DIR__ . '/../db/config.php';
 
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $usuarioId = $data['usuarioId'] ?? 0;
-    $numero = $data['numero'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
-    if (!$usuarioId || !$numero) {
-        echo json_encode(['success' => false, 'message' => 'Dados incompletos.']);
+require_once '../db/config.php';
+
+try {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $id = isset($input['id']) ? intval($input['id']) : 0;
+
+    if (!$id) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'ID não fornecido'
+        ]);
         exit;
     }
 
-    global $conn;
-    if (!$conn) {
-        echo json_encode(['success' => false, 'message' => 'Conexão com o banco não encontrada.']);
-        exit;
-    }
-
-    $stmt = $conn->prepare('DELETE FROM possiveis_ganhadores WHERE usuario_id = ? AND numero = ?');
-    $stmt->bind_param('is', $usuarioId, $numero);
+    // Deletar pelo ID da tabela possiveis_ganhadores
+    $stmt = $conn->prepare('DELETE FROM possiveis_ganhadores WHERE id = ?');
+    $stmt->bind_param('i', $id);
     
     if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Removido dos possíveis ganhadores.']);
+        if ($stmt->affected_rows > 0) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Possível contemplado removido com sucesso'
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Possível contemplado não encontrado'
+            ]);
+        }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Erro ao remover.']);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Erro ao remover: ' . $conn->error
+        ]);
     }
+
+    $stmt->close();
+    $conn->close();
+
+} catch (Exception $e) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Erro: ' . $e->getMessage()
+    ]);
 }
 ?>

@@ -1,35 +1,50 @@
 <?php
 date_default_timezone_set('America/Sao_Paulo');
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/../php-error.log');
-include_once __DIR__ . '/../db/config.php';
 
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $query = trim($data['query'] ?? '');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
-    if (!$query) {
-        echo json_encode(['success' => false, 'message' => 'Nenhum termo de busca informado.']);
+require_once '../db/config.php';
+
+try {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $searchTerm = isset($input['searchTerm']) ? trim($input['searchTerm']) : '';
+
+    if (empty($searchTerm)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Termo de busca não fornecido'
+        ]);
         exit;
     }
 
-    global $conn;
-    if (!$conn) {
-        echo json_encode(['success' => false, 'message' => 'Conexão com o banco não encontrada.']);
-        exit;
-    }
+    // Remover pontuação para buscar por CPF/CNPJ
+    $cleanedTerm = preg_replace('/\D/', '', $searchTerm);
 
-    // Remove formatação de CPF para busca
-    $cpf = preg_replace('/\D/', '', $query);
+    // Buscar por CPF/CNPJ ou por nome
+    $sql = "SELECT 
+                u.id,
+                u.cpf,
+                u.razao_social,
+                u.data_nascimento_abertura,
+                u.created_at
+            FROM usuarios u
+            WHERE u.cpf LIKE ? 
+               OR u.razao_social LIKE ?
+            LIMIT 1";
     
-    // Buscar por CPF
-    $stmt = $conn->prepare('SELECT id, cpf, created_at FROM usuarios WHERE cpf = ? LIMIT 1');
-    $stmt->bind_param('s', $cpf);
+    $likeTerm = "%{$cleanedTerm}%";
+    $likeNameTerm = "%{$searchTerm}%";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $likeTerm, $likeNameTerm);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -41,34 +56,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $result->fetch_assoc();
     $userId = $user['id'];
 
-    // Buscar números da sorte
-    $stmt = $conn->prepare('SELECT numero FROM numeros WHERE usuario_id = ? ORDER BY created_at DESC');
-    $stmt->bind_param('i', $userId);
-    $stmt->execute();
-    $numerosResult = $stmt->get_result();
+    // Buscar números mensais
+    $sqlNumerosMensais = "SELECT numero FROM numeros_mensais WHERE usuario_id = ? ORDER BY numero";
+    $stmtMensais = $conn->prepare($sqlNumerosMensais);
+    $stmtMensais->bind_param("i", $userId);
+    $stmtMensais->execute();
+    $resultMensais = $stmtMensais->get_result();
+    
     $numeros = [];
-    while ($row = $numerosResult->fetch_assoc()) {
+    while ($row = $resultMensais->fetch_assoc()) {
         $numeros[] = $row['numero'];
     }
+    $stmtMensais->close();
+
+    // Buscar números periódicos
+    $sqlNumerosPeriodicos = "SELECT numero FROM numeros_periodicos WHERE usuario_id = ? ORDER BY numero";
+    $stmtPeriodicos = $conn->prepare($sqlNumerosPeriodicos);
+    $stmtPeriodicos->bind_param("i", $userId);
+    $stmtPeriodicos->execute();
+    $resultPeriodicos = $stmtPeriodicos->get_result();
+    
+    while ($row = $resultPeriodicos->fetch_assoc()) {
+        $numeros[] = $row['numero'];
+    }
+    $stmtPeriodicos->close();
+
+    // Remover duplicatas e ordenar
+    $numeros = array_unique($numeros);
+    sort($numeros);
 
     // Buscar histórico de chaves de acesso
-    $stmt = $conn->prepare('SELECT chave_acesso, quantidade_numeros, uploaded_by, created_at FROM chaves_acesso WHERE usuario_id = ? ORDER BY created_at DESC');
-    $stmt->bind_param('i', $userId);
-    $stmt->execute();
-    $chavesResult = $stmt->get_result();
+    $sqlChaves = "SELECT 
+                    chave_acesso,
+                    quantidade_numeros,
+                    tipo_sorteio,
+                    periodo_referencia,
+                    periodo_ano,
+                    uploaded_by,
+                    created_at
+                  FROM chaves_acesso 
+                  WHERE usuario_id = ? 
+                  ORDER BY created_at DESC";
+    
+    $stmtChaves = $conn->prepare($sqlChaves);
+    $stmtChaves->bind_param("i", $userId);
+    $stmtChaves->execute();
+    $chavesResult = $stmtChaves->get_result();
     $historico = [];
     while ($row = $chavesResult->fetch_assoc()) {
         $historico[] = $row;
     }
+    $stmtChaves->close();
 
     echo json_encode([
         'success' => true,
         'content' => [
             'id' => $user['id'],
             'cpf' => $user['cpf'],
+            'razao_social' => $user['razao_social'],
+            'data_nascimento_abertura' => $user['data_nascimento_abertura'],
             'numeros' => $numeros,
-            'historico' => $historico
+            'historico' => $historico,
+            'created_at' => $user['created_at']
         ]
+    ]);
+
+    $stmt->close();
+    $conn->close();
+
+} catch (Exception $e) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Erro ao buscar participante: ' . $e->getMessage()
     ]);
 }
 ?>

@@ -1,36 +1,38 @@
 <?php
 date_default_timezone_set('America/Sao_Paulo');
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/../php-error.log');
-include_once __DIR__ . '/../db/config.php';
 
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    global $conn;
-    if (!$conn) {
-        echo json_encode(['success' => false, 'message' => 'Conexão com o banco não encontrada.']);
-        exit;
-    }
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
-    // Buscar todos os usuários com contagem de números
+require_once '../db/config.php';
+
+try {
+    // Buscar todos os usuários com contagem de números (mensais e periódicos)
     $sql = "SELECT 
                 u.id,
                 u.cpf,
+                u.razao_social,
+                u.data_nascimento_abertura,
                 u.created_at,
-                COALESCE(COUNT(DISTINCT n.id), 0) AS qtd_numeros
+                (SELECT COUNT(*) FROM numeros_mensais WHERE usuario_id = u.id) +
+                (SELECT COUNT(*) FROM numeros_periodicos WHERE usuario_id = u.id) AS qtd_numeros
             FROM usuarios u
-            LEFT JOIN numeros n ON n.usuario_id = u.id
-            GROUP BY u.id, u.cpf, u.created_at
-            ORDER BY u.id DESC";
+            ORDER BY qtd_numeros DESC, u.id DESC";
     
     $result = $conn->query($sql);
     
     if (!$result) {
-        echo json_encode(['success' => false, 'message' => 'Erro na consulta.']);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Erro na consulta: ' . $conn->error
+        ]);
         exit;
     }
     
@@ -39,6 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $users[] = [
             'id' => (int)$row['id'],
             'cpf' => $row['cpf'],
+            'razao_social' => $row['razao_social'],
+            'data_nascimento_abertura' => $row['data_nascimento_abertura'],
             'qtd_numeros' => (int)$row['qtd_numeros'],
             'created_at' => $row['created_at']
         ];
@@ -47,6 +51,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode([
         'success' => true,
         'content' => $users
+    ]);
+
+    $conn->close();
+
+} catch (Exception $e) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Erro ao buscar usuários: ' . $e->getMessage()
     ]);
 }
 ?>

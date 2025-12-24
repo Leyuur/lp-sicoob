@@ -209,6 +209,7 @@ try {
         $result = $stmt->get_result();
         
         if ($result->num_rows > 0) {
+            // Usuário já existe - mantém os dados originais, não sobrescreve
             $usuario = $result->fetch_assoc();
             $usuarioId = $usuario['id'];
         } else {

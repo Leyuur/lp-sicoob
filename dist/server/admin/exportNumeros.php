@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql = "SELECT 
             n.numero,
             u.cpf,
+            COALESCE(u.razao_social, u.name) as nome,
             u.created_at
         FROM numeros n
         INNER JOIN usuarios u ON n.usuario_id = u.id";
@@ -66,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $numeros[] = [
                 'numero' => $row['numero'],
                 'cpf' => $row['cpf'],
+                'nome' => $row['nome'],
                 'created_at' => $row['created_at']
             ];
         }

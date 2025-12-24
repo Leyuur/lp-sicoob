@@ -1,17 +1,29 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, Users, Upload, Download, FileText, Search, Sparkles } from 'lucide-react'
+import { LogOut, Users, Upload, Download, FileText, Search, Sparkles, Award, Trophy } from 'lucide-react'
 import { toast } from 'react-toastify'
 import logoSicoob from '../assets/img/logos/logo-sicoob.png'
 import ParticipantsList from '../components/admin/ParticipantsList'
+import NumbersSearch from '../components/admin/NumbersSearch'
+import PossibleWinners from '../components/admin/PossibleWinners'
+import WinnersList from '../components/admin/WinnersList'
 import ImportData from '../components/admin/ImportData'
-import ExportData from '../components/admin/ExportData'
+import ExportData from '../components/admin/ExportDataNew'
 import LogsViewer from '../components/admin/LogsViewer'
 
 function AdminPanel() {
   const [admin, setAdmin] = useState(null)
-  const [activeTab, setActiveTab] = useState('participants')
+  // Recuperar aba ativa salva no localStorage, ou usar 'participants' como padrão
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('adminActiveTab') || 'participants'
+  })
+  const [selectedNumero, setSelectedNumero] = useState('')
   const navigate = useNavigate()
+
+  const handleNumeroClick = (numero) => {
+    setSelectedNumero(numero)
+    setActiveTab('numbers')
+  }
 
   useEffect(() => {
     // Verificar autenticação
@@ -30,8 +42,14 @@ function AdminPanel() {
     }
   }, [navigate])
 
+  // Salvar aba ativa quando mudar
+  useEffect(() => {
+    localStorage.setItem('adminActiveTab', activeTab)
+  }, [activeTab])
+
   const handleLogout = () => {
     localStorage.removeItem('adminAuth')
+    localStorage.removeItem('adminActiveTab')
     toast.success('Logout realizado com sucesso!', {
       position: "top-right",
       autoClose: 3000,
@@ -44,7 +62,10 @@ function AdminPanel() {
   }
 
   const tabs = [
-    { id: 'participants', label: 'Consulta por CPF', icon: Users },
+    { id: 'participants', label: 'Consulta por CPF/CNPJ', icon: Users },
+    { id: 'numbers', label: 'Números da Sorte', icon: Sparkles },
+    { id: 'possibleWinners', label: 'Possíveis Contemplados', icon: Award },
+    { id: 'winners', label: 'Ganhadores', icon: Trophy },
     { id: 'import', label: 'Importar Dados', icon: Upload },
     { id: 'export', label: 'Exportar', icon: Download },
     { id: 'logs', label: 'Logs', icon: FileText }
@@ -65,7 +86,7 @@ function AdminPanel() {
                   Painel Administrativo
                 </h1>
                 <p className="text-sm text-white/90">
-                  Gestão da Promoção Black Cassol
+                  Gestão da Promoção Sicoob
                 </p>
               </div>
             </div>
@@ -108,7 +129,10 @@ function AdminPanel() {
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'participants' && <ParticipantsList adminName={admin.username} />}
+        {activeTab === 'participants' && <ParticipantsList adminName={admin.username} onNumeroClick={handleNumeroClick} />}
+        {activeTab === 'numbers' && <NumbersSearch adminName={admin.username} initialNumero={selectedNumero} />}
+        {activeTab === 'possibleWinners' && <PossibleWinners adminName={admin.username} />}
+        {activeTab === 'winners' && <WinnersList />}
         {activeTab === 'import' && <ImportData adminName={admin.username} />}
         {activeTab === 'export' && <ExportData />}
         {activeTab === 'logs' && <LogsViewer />}

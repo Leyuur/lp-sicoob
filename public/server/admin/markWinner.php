@@ -1,46 +1,149 @@
 <?php
 date_default_timezone_set('America/Sao_Paulo');
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 1);
-include_once __DIR__ . '/../db/config.php';
 
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $usuarioId = $data['usuarioId'] ?? 0;
-    $numero = $data['numero'] ?? '';
-    $premiadoPor = $data['premiadoPor'] ?? 'admin';
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
-    if (!$usuarioId || !$numero) {
-        echo json_encode(['success' => false, 'message' => 'Dados incompletos.']);
+require_once '../db/config.php';
+
+try {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $possibleWinnerId = isset($input['possibleWinnerId']) ? intval($input['possibleWinnerId']) : 0;
+    $premiadoPor = isset($input['premiadoPor']) ? trim($input['premiadoPor']) : 'admin';
+
+    if (!$possibleWinnerId) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'ID do possível ganhador não fornecido'
+        ]);
         exit;
     }
 
-    global $conn;
-    if (!$conn) {
-        echo json_encode(['success' => false, 'message' => 'Conexão com o banco não encontrada.']);
+    // Buscar dados do possível ganhador
+    $sqlSelect = "SELECT 
+                    usuario_id,
+                    numero,
+                    tipo_sorteio,
+                    periodo_referencia,
+                    periodo_ano,
+                    data_indicacao
+                  FROM possiveis_ganhadores 
+                  WHERE id = ?";
+    
+    $stmt = $conn->prepare($sqlSelect);
+    $stmt->bind_param("i", $possibleWinnerId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Possível contemplado não encontrado'
+        ]);
+        exit;
+    }
+    
+    $winner = $result->fetch_assoc();
+    $stmt->close();
+
+    // Determinar categoria do sorteio
+    $categoria = '';
+    if ($winner['tipo_sorteio'] === 'mensal') {
+        $categoria = 'mensal';
+    } else {
+        // Determinar categoria dos periódicos
+        $periodico = $winner['periodo_referencia'];
+        if (strpos($periodico, 'trimestre') !== false) {
+            $categoria = 'trimestral';
+        } elseif ($periodico === 'semestral') {
+            $categoria = 'semestral';
+        } elseif ($periodico === 'anual') {
+            $categoria = 'anual';
+        }
+    }
+
+    // Verificar se usuário já ganhou nesta categoria
+    $sqlCheck = "SELECT COUNT(*) as total FROM ganhadores g
+                 WHERE g.usuario_id = ?
+                 AND (
+                     (? = 'mensal' AND g.tipo_sorteio = 'mensal')
+                     OR (? = 'trimestral' AND g.periodo_referencia LIKE 'trimestre_%')
+                     OR (? = 'semestral' AND g.periodo_referencia = 'semestral')
+                     OR (? = 'anual' AND g.periodo_referencia = 'anual')
+                 )";
+    
+    $stmtCheck = $conn->prepare($sqlCheck);
+    $stmtCheck->bind_param("issss", $winner['usuario_id'], $categoria, $categoria, $categoria, $categoria);
+    $stmtCheck->execute();
+    $checkResult = $stmtCheck->get_result();
+    $checkData = $checkResult->fetch_assoc();
+    $stmtCheck->close();
+
+    if ($checkData['total'] > 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Este usuário já foi contemplado na categoria ' . $categoria . '. Cada pessoa pode ganhar no máximo 1x por categoria (mensal, trimestral, semestral, anual).'
+        ]);
         exit;
     }
 
     // Inserir em ganhadores oficiais
-    $stmt = $conn->prepare('INSERT INTO ganhadores (usuario_id, numero, premiado_por) VALUES (?, ?, ?)');
-    $stmt->bind_param('iss', $usuarioId, $numero, $premiadoPor);
+    $sqlInsert = "INSERT INTO ganhadores 
+                  (usuario_id, numero, tipo_sorteio, periodo_referencia, periodo_ano, data_indicacao, indicado_por, status) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, 'contemplado')";
     
-    if ($stmt->execute()) {
-        // Remover de possíveis ganhadores se existir
-        $stmt2 = $conn->prepare('DELETE FROM possiveis_ganhadores WHERE usuario_id = ? AND numero = ?');
-        $stmt2->bind_param('is', $usuarioId, $numero);
-        $stmt2->execute();
+    $stmtInsert = $conn->prepare($sqlInsert);
+    $stmtInsert->bind_param(
+        "issssss",
+        $winner['usuario_id'],
+        $winner['numero'],
+        $winner['tipo_sorteio'],
+        $winner['periodo_referencia'],
+        $winner['periodo_ano'],
+        $winner['data_indicacao'],
+        $premiadoPor
+    );
+    
+    if ($stmtInsert->execute()) {
+        // Remover de possíveis ganhadores
+        $sqlDelete = "DELETE FROM possiveis_ganhadores WHERE id = ?";
+        $stmtDelete = $conn->prepare($sqlDelete);
+        $stmtDelete->bind_param("i", $possibleWinnerId);
+        $stmtDelete->execute();
+        $stmtDelete->close();
         
-        echo json_encode(['success' => true, 'message' => 'Marcado como ganhador oficial.']);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Contemplado confirmado com sucesso!'
+        ]);
     } else {
-        if ($conn->errno === 1062) { // Duplicate entry
-            echo json_encode(['success' => false, 'message' => 'Já está marcado como ganhador.']);
+        if ($conn->errno === 1062) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Este número já está registrado como contemplado'
+            ]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Erro ao marcar: ' . $conn->error]);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao confirmar: ' . $conn->error
+            ]);
         }
     }
+
+    $stmtInsert->close();
+    $conn->close();
+
+} catch (Exception $e) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Erro: ' . $e->getMessage()
+    ]);
 }
 ?>

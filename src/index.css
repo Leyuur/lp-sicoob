@@ -9,3 +9,34 @@ button, a {
   cursor: pointer;
 }
 
+/* Estilização moderna da barra de rolagem */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #04c8b0 0%, #03a088 100%);
+  border-radius: 10px;
+  border: 2px solid #1f2937;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #03a088 0%, #028570 100%);
+  border: 2px solid #374151;
+}
+
+::-webkit-scrollbar-corner {
+  background: #1f2937;
+}
+
+/* Para Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #04c8b0 #1f2937;
+}
