@@ -22,7 +22,7 @@ function Loading({ onComplete }) {
   }, [onComplete])
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-gradient-to-br from-[#04c8b0] via-[#03a088] to-[#028570] flex items-center justify-center">
+    <div className="fixed inset-0 z-[9999] bg-[#0a4946] flex items-center justify-center">
       {/* Background animated circles */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse"></div>

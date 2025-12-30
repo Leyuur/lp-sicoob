@@ -40,7 +40,7 @@ function App() {
           style={{ zIndex: 99999 }}
         />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home loadingComplete={!isLoading} />} />
           <Route path="/consultar" element={<Consultar />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/panel" element={<AdminPanel />} />

@@ -4,7 +4,7 @@ import ConsultaNumeros from '../components/ConsultaNumeros'
 
 function Consultar() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#04c8b0] via-[#03a088] to-[#028570]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0e5f5c] via-[#117a76] to-[#0a4946]">
       {/* Botão Voltar */}
       <div className="absolute top-6 left-6 z-50">
         <Link

@@ -6,12 +6,12 @@ import Ganhadores from '../components/Ganhadores'
 import Regulamento from '../components/Regulamento'
 import Footer from '../components/Footer'
 
-function Home() {
+function Home({ loadingComplete = false }) {
   return (
     <>
-      <Header />
+      <Header loadingComplete={loadingComplete} />
       <main>
-        <Inicio />
+        <Inicio loadingComplete={loadingComplete} />
         {/* <ComoParticipar /> */}
         <FAQ />
         <Ganhadores />

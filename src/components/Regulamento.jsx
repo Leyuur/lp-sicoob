@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react'
 import { FileText, Download, Eye, Smartphone } from 'lucide-react'
+import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
 function Regulamento() {
   const [isMobile, setIsMobile] = useState(false)
+  const [headerRef, headerVisible] = useScrollAnimation({ threshold: 0.2 })
+  const [buttonsRef, buttonsVisible] = useScrollAnimation({ threshold: 0.2 })
+  const [contentRef, contentVisible] = useScrollAnimation({ threshold: 0.1 })
   const pdfUrl = './regulamento/Regulamento.pdf' // Ajuste o caminho conforme necessário
 
   useEffect(() => {
@@ -37,25 +41,25 @@ function Regulamento() {
     <section id="regulamento" className="py-16 sm:py-20 lg:py-24 px-4 bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12 sm:mb-16">
-          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#04c8b0] to-[#03a088] rounded-2xl mb-4 sm:mb-5 shadow-xl hover:scale-110 hover:rotate-12 transition-all duration-300">
+        <div ref={headerRef} className={`text-center mb-12 sm:mb-16 scroll-animate ${headerVisible ? 'animate-in' : ''}`}>
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#0e5f5c] to-[#117a76] rounded-2xl mb-4 sm:mb-5 shadow-xl hover:scale-110 hover:rotate-12 transition-all duration-300">
             <FileText size={24} className="sm:w-7 sm:h-7 text-white" strokeWidth={2} />
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#03694e] mb-3 sm:mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#0e5f5c] mb-3 sm:mb-4">
             Regulamento
           </h2>
-          <div className="w-24 h-1.5 bg-gradient-to-r from-[#04c8b0] to-[#03a088] mx-auto rounded-full mb-4"></div>
+          <div className="w-24 h-1.5 bg-gradient-to-r from-[#d4a574] to-[#f0c987] mx-auto rounded-full mb-4"></div>
           <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
             Confira todas as regras e condições da campanha
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 max-w-2xl mx-auto">
+        <div ref={buttonsRef} className={`flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 max-w-2xl mx-auto scroll-animate ${buttonsVisible ? 'animate-in' : ''}`}>
           {!isMobile && (
             <button
               onClick={handleDownloadPdf}
-              className="flex items-center justify-center gap-2 bg-white text-[#03694e] border-2 border-[#04c8b0] px-5 sm:px-6 py-3 sm:py-4 rounded-xl font-bold text-sm sm:text-base shadow-lg hover:bg-[#04c8b0] hover:text-white transform hover:scale-105 active:scale-100 transition-all duration-300"
+              className="flex items-center justify-center gap-2 bg-white text-[#0e5f5c] border-2 border-[#0e5f5c] px-5 sm:px-6 py-3 sm:py-4 rounded-xl font-bold text-sm sm:text-base shadow-lg hover:bg-[#0e5f5c] hover:text-white transform hover:scale-105 active:scale-100 transition-all duration-300"
             >
               <Download size={18} className="sm:w-5 sm:h-5" />
               Baixar PDF
@@ -64,14 +68,14 @@ function Regulamento() {
         </div>
 
         {/* PDF Viewer Container */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+        <div ref={contentRef} className={`bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden scroll-animate-scale ${contentVisible ? 'animate-in' : ''}`}>
           {isMobile ? (
             // Mobile: Card com instrução
             <div className="p-6 sm:p-8 md:p-12 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#04c8b0] to-[#03a088] rounded-3xl mb-5 sm:mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#0e5f5c] to-[#117a76] rounded-3xl mb-5 sm:mb-6">
                 <Smartphone size={28} className="sm:w-9 sm:h-9 text-white" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-[#03694e] mb-3 sm:mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-[#0e5f5c] mb-3 sm:mb-4">
                 Visualização em Dispositivo Móvel
               </h3>
               <p className="text-gray-600 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 leading-relaxed">
@@ -80,7 +84,7 @@ function Regulamento() {
               <div className="grid gap-3 sm:gap-4 max-w-md mx-auto">
                 <button
                   onClick={handleOpenPdf}
-                  className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#04c8b0] to-[#03a088] text-white px-5 sm:px-6 py-3 sm:py-4 rounded-xl font-bold text-sm sm:text-base shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-100 transition-all duration-300"
+                  className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#0e5f5c] to-[#117a76] text-white px-5 sm:px-6 py-3 sm:py-4 rounded-xl font-bold text-sm sm:text-base shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-100 transition-all duration-300"
                 >
                   <Eye size={18} className="sm:w-5 sm:h-5" />
                   Abrir em Nova Aba
@@ -115,7 +119,7 @@ function Regulamento() {
                     </p>
                     <button
                       onClick={handleDownloadPdf}
-                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#04c8b0] to-[#03a088] text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-100 transition-all duration-300"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#0e5f5c] to-[#117a76] text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-100 transition-all duration-300"
                     >
                       <Download size={18} className="sm:w-5 sm:h-5" />
                       Baixar Regulamento

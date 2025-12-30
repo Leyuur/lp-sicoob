@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { HelpCircle, ChevronDown, ChevronUp } from 'lucide-react'
+import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
 const faqData = [
   {
@@ -46,6 +47,8 @@ const faqData = [
 
 function FAQ() {
   const [expandedId, setExpandedId] = useState(null)
+  const [headerRef, headerVisible] = useScrollAnimation({ threshold: 0.2 })
+  const [listRef, listVisible] = useScrollAnimation({ threshold: 0.1 })
 
   const toggleFaq = (id) => {
     setExpandedId(expandedId === id ? null : id)
@@ -55,26 +58,25 @@ function FAQ() {
     <section id="faq" className="py-16 sm:py-20 lg:py-24 px-4 bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12 sm:mb-16">
-          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#04c8b0] to-[#03a088] rounded-2xl mb-4 sm:mb-5 shadow-xl hover:scale-110 hover:rotate-12 transition-all duration-300">
+        <div ref={headerRef} className={`text-center mb-12 sm:mb-16 scroll-animate ${headerVisible ? 'animate-in' : ''}`}>
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#0e5f5c] to-[#117a76] rounded-2xl mb-4 sm:mb-5 shadow-xl hover:scale-110 hover:rotate-12 transition-all duration-300">
             <HelpCircle size={24} className="sm:w-7 sm:h-7 text-white" strokeWidth={2} />
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#03694e] mb-3 sm:mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#0e5f5c] mb-3 sm:mb-4">
             Perguntas Frequentes
           </h2>
-          <div className="w-24 h-1.5 bg-gradient-to-r from-[#04c8b0] to-[#03a088] mx-auto rounded-full mb-4"></div>
+          <div className="w-24 h-1.5 bg-gradient-to-r from-[#d4a574] to-[#f0c987] mx-auto rounded-full mb-4"></div>
           <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
             Tire suas dúvidas sobre a campanha
           </p>
         </div>
 
         {/* FAQ Accordion */}
-        <div className="space-y-3 sm:space-y-4">
-          {faqData.map((faq) => (
+        <div ref={listRef} className={`space-y-3 sm:space-y-4 scroll-animate ${listVisible ? 'animate-in' : ''}`}>
+          {faqData.map((faq, index) => (
             <div
               key={faq.id}
-              className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-[#04c8b0]/30"
-            >
+              className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-[#d4a574]/40"              style={{ transitionDelay: listVisible ? `${index * 0.1}s` : '0s' }}            >
               {/* Question Button */}
               <button
                 onClick={() => toggleFaq(faq.id)}

@@ -1,11 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Menu, X, Home, Settings, HelpCircle, Trophy, FileText, Search, Sparkles } from 'lucide-react'
 import logoSicoob from '../assets/img/logos/logo-sicoob.png'
 
-function Header() {
+function Header({ loadingComplete = false }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showAnimations, setShowAnimations] = useState(false)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (loadingComplete) {
+      // Pequeno delay para garantir que o loading saiu completamente
+      const timer = setTimeout(() => {
+        setShowAnimations(true)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [loadingComplete])
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id)
@@ -39,14 +50,14 @@ function Header() {
   }
 
   return (
-    <header className="bg-gradient-to-r from-[#03694e] via-[#028570] to-[#03694e] backdrop-blur-lg text-white sticky top-0 z-50 shadow-xl border-b border-white/10">
+    <header className={`bg-[#0a4946] text-white sticky top-0 z-50 shadow-2xl border-b border-white/20 ${showAnimations ? 'slide-from-top' : 'opacity-0'}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-5">
         <div className="flex items-center justify-between relative z-[51]">
           <div className="flex items-center gap-4">
             <img 
               src={logoSicoob} 
               alt="Sicoob" 
-              className="h-10 lg:h-12 transition-transform duration-300 hover:scale-110 cursor-pointer drop-shadow-lg" 
+              className="h-10 lg:h-12 transition-transform duration-300 hover:scale-110 cursor-pointer drop-shadow-lg"
               onClick={() => scrollToSection('inicio')}
             />
           </div>
@@ -55,7 +66,7 @@ function Header() {
             <button onClick={() => scrollToSection('inicio')} className="flex items-center gap-2 transition-all duration-300 font-semibold text-sm xl:text-base relative group text-white/90 hover:text-white">
               <Home size={18} className="group-hover:scale-110 transition-transform" /> 
               <span>Início</span>
-              <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#04c8b0] to-yellow-300 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
+              <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#d4a574] to-[#f0c987] transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
             </button>
             {/* <button onClick={() => scrollToSection('como-participar')} className="flex items-center gap-2 transition-all duration-300 font-semibold text-sm xl:text-base relative group text-white/90 hover:text-white">
               <Settings size={18} className="group-hover:scale-110 transition-transform" /> 
@@ -65,22 +76,22 @@ function Header() {
             <button onClick={() => scrollToSection('faq')} className="flex items-center gap-2 transition-all duration-300 font-semibold text-sm xl:text-base relative group text-white/90 hover:text-white">
               <HelpCircle size={18} className="group-hover:scale-110 transition-transform" /> 
               <span>FAQ</span>
-              <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#04c8b0] to-yellow-300 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
+              <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#d4a574] to-[#f0c987] transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
             </button>
             <button onClick={() => scrollToSection('ganhadores')} className="flex items-center gap-2 transition-all duration-300 font-semibold text-sm xl:text-base relative group text-white/90 hover:text-white">
               <Trophy size={18} className="group-hover:scale-110 transition-transform" /> 
               <span>Ganhadores</span>
-              <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#04c8b0] to-yellow-300 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
+              <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#d4a574] to-[#f0c987] transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
             </button>
             <button onClick={() => scrollToSection('regulamento')} className="flex items-center gap-2 transition-all duration-300 font-semibold text-sm xl:text-base relative group text-white/90 hover:text-white">
               <FileText size={18} className="group-hover:scale-110 transition-transform" /> 
               <span>Regulamento</span>
-              <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#04c8b0] to-yellow-300 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
+              <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#d4a574] to-[#f0c987] transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
             </button>
             <div className="ml-2">
               <Link
                 to="/consultar"
-                className="flex items-center gap-2 px-5 xl:px-6 py-2.5 xl:py-3 rounded-xl transition-all duration-300 font-bold text-sm xl:text-base bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 hover:from-yellow-300 hover:via-yellow-200 hover:to-yellow-300 text-[#03694e] shadow-lg shadow-yellow-400/30 hover:shadow-xl hover:shadow-yellow-400/50 transform hover:scale-105 border-2 border-yellow-500/30"
+                className="flex items-center gap-2 px-5 xl:px-6 py-2.5 xl:py-3 rounded-xl transition-all duration-300 font-bold text-sm xl:text-base bg-gradient-to-r from-[#d4a574] via-[#e8ba7f] to-[#d4a574] hover:from-[#e8ba7f] hover:via-[#f0c987] hover:to-[#e8ba7f] text-[#0a4946] shadow-lg shadow-[#d4a574]/30 hover:shadow-xl hover:shadow-[#d4a574]/50 transform hover:scale-105 border-2 border-[#d4a574]/30"
               >
                 <Sparkles size={18} className="animate-pulse" /> 
                 <span className="hidden xl:inline">Consulte seus Números</span>

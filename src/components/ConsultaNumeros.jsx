@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Search, Calendar, User, Sparkles } from 'lucide-react'
 import { toast } from 'react-toastify'
+import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
 function ConsultaNumeros() {
   const [cpfCnpj, setCpfCnpj] = useState('')
@@ -10,6 +11,7 @@ function ConsultaNumeros() {
   const [userName, setUserName] = useState('')
   const [showResults, setShowResults] = useState(false)
   const [errors, setErrors] = useState({ cpfCnpj: false, dataNascimento: false })
+  const [cardRef, cardVisible] = useScrollAnimation({ threshold: 0.2 })
 
   // Máscara para CPF/CNPJ
   const formatCpfCnpj = (value) => {
@@ -127,7 +129,7 @@ function ConsultaNumeros() {
   }
 
   return (
-    <div id="consultar-numeros" className="min-h-screen bg-gradient-to-br from-[#04c8b0] via-[#03a088] to-[#028570] flex items-center justify-center px-4 py-16 sm:py-20 lg:py-24 relative overflow-hidden">
+    <div id="consultar-numeros" className="min-h-screen bg-gradient-to-br from-[#0e5f5c] via-[#117a76] to-[#0a4946] flex items-center justify-center px-4 py-16 sm:py-20 lg:py-24 relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-full opacity-10">
         <div className="absolute top-20 left-10 w-48 sm:w-72 h-48 sm:h-72 bg-white rounded-full blur-3xl animate-pulse"></div>
@@ -138,13 +140,13 @@ function ConsultaNumeros() {
       <div className="w-full max-w-2xl relative z-10">
         {!showResults ? (
           /* Card de Consulta */
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100 backdrop-blur-sm">
+          <div ref={cardRef} className={`bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100 backdrop-blur-sm scroll-animate-scale ${cardVisible ? 'animate-in' : ''}`}>
             <form onSubmit={handleConsulta} className="space-y-5 sm:space-y-6">
               <div className="text-center mb-5 sm:mb-6">
-                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#04c8b0] to-[#03a088] rounded-2xl mb-3 sm:mb-4 shadow-lg hover:scale-110 transition-transform duration-300">
+                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#0e5f5c] to-[#117a76] rounded-2xl mb-3 sm:mb-4 shadow-lg hover:scale-110 transition-transform duration-300">
                   <Search size={24} className="sm:w-7 sm:h-7 text-white" strokeWidth={2} />
                 </div>
-                <h3 className="text-[#03694e] font-bold text-xl sm:text-2xl mb-2">
+                <h3 className="text-[#0e5f5c] font-bold text-xl sm:text-2xl mb-2">
                   Consulte seus números
                 </h3>
                 <p className="text-gray-600 text-xs sm:text-sm">
@@ -167,7 +169,7 @@ function ConsultaNumeros() {
                   placeholder="000.000.000-00"
                   inputMode="numeric"
                   maxLength={18}
-                  className={`w-full px-4 sm:px-5 py-3 sm:py-4 pr-11 sm:pr-12 rounded-xl bg-gray-50 text-gray-800 placeholder:text-gray-400 text-sm sm:text-base font-medium outline-none border-2 transition-all duration-200 ${errors.cpfCnpj ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-[#04c8b0] group-hover:border-gray-300'} focus:bg-white`}
+                  className={`w-full px-4 sm:px-5 py-3 sm:py-4 pr-11 sm:pr-12 rounded-xl bg-gray-50 text-gray-800 placeholder:text-gray-400 text-sm sm:text-base font-medium outline-none border-2 transition-all duration-200 ${errors.cpfCnpj ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-[#0e5f5c] group-hover:border-gray-300'} focus:bg-white`}
                 />
                 <div className="absolute right-3 sm:right-4 top-9 sm:top-11 text-gray-400">
                   <User size={18} className="sm:w-5 sm:h-5" />
@@ -189,7 +191,7 @@ function ConsultaNumeros() {
                   placeholder="DD/MM/AAAA"
                   inputMode="numeric"
                   maxLength={10}
-                  className={`w-full px-4 sm:px-5 py-3 sm:py-4 pr-11 sm:pr-12 rounded-xl bg-gray-50 text-gray-800 placeholder:text-gray-400 text-sm sm:text-base font-medium outline-none border-2 transition-all duration-200 ${errors.dataNascimento ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-[#04c8b0] group-hover:border-gray-300'} focus:bg-white`}
+                  className={`w-full px-4 sm:px-5 py-3 sm:py-4 pr-11 sm:pr-12 rounded-xl bg-gray-50 text-gray-800 placeholder:text-gray-400 text-sm sm:text-base font-medium outline-none border-2 transition-all duration-200 ${errors.dataNascimento ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-[#0e5f5c] group-hover:border-gray-300'} focus:bg-white`}
                 />
                 <div className="absolute right-3 sm:right-4 top-9 sm:top-11 text-gray-400">
                   <Calendar size={18} className="sm:w-5 sm:h-5" />
@@ -200,7 +202,7 @@ function ConsultaNumeros() {
               <button
                 type="submit"
                 disabled={loading}
-                className="relative w-full bg-gradient-to-r from-[#04c8b0] to-[#03a088] hover:from-[#03a088] hover:to-[#04c8b0] text-white font-bold py-3 sm:py-4 px-6 rounded-xl uppercase tracking-wide transition-all duration-300 transform hover:scale-[1.02] active:scale-100 flex items-center justify-center gap-2 sm:gap-3 shadow-xl shadow-[#04c8b0]/30 hover:shadow-2xl hover:shadow-[#04c8b0]/40 overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-sm sm:text-base"
+                className="relative w-full bg-gradient-to-r from-[#0e5f5c] to-[#117a76] hover:from-[#117a76] hover:to-[#0e5f5c] text-white font-bold py-3 sm:py-4 px-6 rounded-xl uppercase tracking-wide transition-all duration-300 transform hover:scale-[1.02] active:scale-100 flex items-center justify-center gap-2 sm:gap-3 shadow-xl shadow-[#0e5f5c]/30 hover:shadow-2xl hover:shadow-[#0e5f5c]/40 overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-sm sm:text-base"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 {loading ? (
@@ -225,12 +227,12 @@ function ConsultaNumeros() {
           </div>
         ) : (
           /* Card de Resultados */
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100 backdrop-blur-sm">
+          <div ref={cardRef} className={`bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100 backdrop-blur-sm scroll-animate-scale ${cardVisible ? 'animate-in' : ''}`}>
             <div className="text-center mb-6 sm:mb-8">
               <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl mb-3 sm:mb-4 shadow-lg animate-bounce-slow">
                 <Sparkles size={24} className="sm:w-7 sm:h-7 text-white" strokeWidth={2} />
               </div>
-              <h3 className="text-[#03694e] font-bold text-2xl sm:text-3xl mb-2">
+              <h3 className="text-[#0e5f5c] font-bold text-2xl sm:text-3xl mb-2">
                 Olá, {userName}!
               </h3>
               <p className="text-gray-600 text-sm sm:text-base">
@@ -246,7 +248,7 @@ function ConsultaNumeros() {
                     {numeros.map((numero, index) => (
                       <div
                         key={index}
-                        className="bg-gradient-to-br from-[#04c8b0] to-[#03a088] text-white font-bold text-base sm:text-xl py-3 sm:py-4 px-3 sm:px-4 rounded-xl shadow-lg text-center hover:scale-105 active:scale-100 transition-transform"
+                        className="bg-gradient-to-br from-[#0e5f5c] to-[#117a76] text-white font-bold text-base sm:text-xl py-3 sm:py-4 px-3 sm:px-4 rounded-xl shadow-lg text-center hover:scale-105 active:scale-100 transition-transform"
                       >
                         {numero}
                       </div>

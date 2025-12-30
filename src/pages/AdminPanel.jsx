@@ -8,7 +8,7 @@ import NumbersSearch from '../components/admin/NumbersSearch'
 import PossibleWinners from '../components/admin/PossibleWinners'
 import WinnersList from '../components/admin/WinnersList'
 import ImportData from '../components/admin/ImportData'
-import ExportData from '../components/admin/ExportDataNew'
+import ExportData from '../components/admin/ExportData'
 import LogsViewer from '../components/admin/LogsViewer'
 
 function AdminPanel() {

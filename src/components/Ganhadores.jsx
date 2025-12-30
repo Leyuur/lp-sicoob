@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Trophy, Calendar, User, Loader2, AlertCircle, Award } from 'lucide-react'
+import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
 function Ganhadores() {
   const [ganhadores, setGanhadores] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [headerRef, headerVisible] = useScrollAnimation({ threshold: 0.2 })
+  const [contentRef, contentVisible] = useScrollAnimation({ threshold: 0.1 })
 
   useEffect(() => {
     fetchGanhadores()
@@ -51,14 +54,14 @@ function Ganhadores() {
     <section id="ganhadores" className="py-16 sm:py-20 lg:py-24 px-4 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12 sm:mb-16">
-          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl mb-4 sm:mb-5 shadow-xl hover:scale-110 hover:rotate-12 transition-all duration-300">
+        <div ref={headerRef} className={`text-center mb-12 sm:mb-16 scroll-animate ${headerVisible ? 'animate-in' : ''}`}>
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#d4a574] to-[#c4915e] rounded-2xl mb-4 sm:mb-5 shadow-xl hover:scale-110 hover:rotate-12 transition-all duration-300">
             <Trophy size={24} className="sm:w-7 sm:h-7 text-white" strokeWidth={2} />
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#03694e] mb-3 sm:mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#0e5f5c] mb-3 sm:mb-4">
             Ganhadores
           </h2>
-          <div className="w-24 h-1.5 bg-gradient-to-r from-yellow-400 to-yellow-600 mx-auto rounded-full mb-4"></div>
+          <div className="w-24 h-1.5 bg-gradient-to-r from-[#d4a574] to-[#f0c987] mx-auto rounded-full mb-4"></div>
           <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
             Confira os sortudos que já ganharam em nossa campanha
           </p>
@@ -66,15 +69,15 @@ function Ganhadores() {
 
         {/* Loading State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-16 sm:py-20">
-            <Loader2 className="text-[#04c8b0] animate-spin mb-4" size={40} strokeWidth={2} />
+          <div ref={contentRef} className={`flex flex-col items-center justify-center py-16 sm:py-20 scroll-animate-scale ${contentVisible ? 'animate-in' : ''}`}>
+            <Loader2 className="text-[#0e5f5c] animate-spin mb-4" size={40} strokeWidth={2} />
             <p className="text-gray-600 font-medium text-sm sm:text-base">Carregando ganhadores...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && !loading && (
-          <div className="bg-red-50 border-2 border-red-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-center">
+          <div ref={contentRef} className={`bg-red-50 border-2 border-red-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-center scroll-animate-scale ${contentVisible ? 'animate-in' : ''}`}>
             <AlertCircle className="text-red-500 mx-auto mb-4" size={40} />
             <h3 className="text-red-800 font-bold text-lg sm:text-xl mb-2">Erro ao carregar ganhadores</h3>
             <p className="text-red-600 mb-5 sm:mb-6 text-sm sm:text-base">{error}</p>
@@ -89,7 +92,7 @@ function Ganhadores() {
 
         {/* Empty State */}
         {!loading && !error && ganhadores.length === 0 && (
-          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center">
+          <div ref={contentRef} className={`bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center scroll-animate-scale ${contentVisible ? 'animate-in' : ''}`}>
             <h3 className="text-gray-800 font-bold text-xl sm:text-2xl mb-3">Nenhum ganhador ainda foi contemplado</h3>
             <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
               Os sortudos ganhadores serão divulgados aqui após cada sorteio.

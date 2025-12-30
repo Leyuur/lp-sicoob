@@ -1,7 +1,10 @@
+import { useScrollAnimation } from '../hooks/useScrollAnimation'
+
 function Footer() {
+  const [footerRef, footerVisible] = useScrollAnimation({ threshold: 0.1 })
 
   return (
-    <footer className="bg-gradient-to-br from-[#03694e] via-[#028570] to-[#03694e] text-white relative overflow-hidden">
+    <footer ref={footerRef} className={`bg-gradient-to-br from-[#0e5f5c] via-[#117a76] to-[#0e5f5c] text-white relative overflow-hidden scroll-animate ${footerVisible ? 'animate-in' : ''}`}>
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
@@ -24,7 +27,7 @@ function Footer() {
           <div className="mt-6 pt-6 border-t border-white/10 text-center">
             <p className="text-white/60 text-xs sm:text-sm flex items-center justify-center gap-2 hover:text-white/80 transition-colors duration-300">
               Desenvolvido por
-              <span className="font-bold text-yellow-300 hover:text-yellow-200 transition-colors duration-300 cursor-default">
+              <span className="font-bold text-[#d4a574] hover:text-[#f0c987] transition-colors duration-300 cursor-default">
                 DRTechs
               </span>
             </p>
