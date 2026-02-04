@@ -1,16 +1,16 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /teste/
+  RewriteBase /
   
   # Se o arquivo ou diretório não existir
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   
   # Não redirecionar requisições de API/PHP
-  RewriteCond %{REQUEST_URI} !^/teste/server/
+  RewriteCond %{REQUEST_URI} !^/server/
   
   # Redireciona tudo para index.html (para SPA React Router funcionar)
-  RewriteRule ^(.*)$ /teste/index.html [L,QSA]
+  RewriteRule ^(.*)$ /index.html [L,QSA]
 </IfModule>
 
 # Cache control para assets

@@ -5,18 +5,7 @@ import logoSicoob from '../assets/img/logos/logo-sicoob.png'
 
 function Header({ loadingComplete = false }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [showAnimations, setShowAnimations] = useState(false)
   const navigate = useNavigate()
-
-  useEffect(() => {
-    if (loadingComplete) {
-      // Pequeno delay para garantir que o loading saiu completamente
-      const timer = setTimeout(() => {
-        setShowAnimations(true)
-      }, 100)
-      return () => clearTimeout(timer)
-    }
-  }, [loadingComplete])
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id)
@@ -50,7 +39,7 @@ function Header({ loadingComplete = false }) {
   }
 
   return (
-    <header className={`bg-[#0a4946] text-white sticky top-0 z-50 shadow-2xl border-b border-white/20 ${showAnimations ? 'slide-from-top' : 'opacity-0'}`}>
+    <header className="bg-[#0a4946] text-white sticky top-0 z-50 shadow-2xl border-b border-white/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-5">
         <div className="flex items-center justify-between relative z-[51]">
           <div className="flex items-center gap-4">
@@ -85,7 +74,7 @@ function Header({ loadingComplete = false }) {
             </button>
             <button onClick={() => scrollToSection('regulamento')} className="flex items-center gap-2 transition-all duration-300 font-semibold text-sm xl:text-base relative group text-white/90 hover:text-white">
               <FileText size={18} className="group-hover:scale-110 transition-transform" /> 
-              <span>Regulamento</span>
+              <span>Regulamentos</span>
               <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-[#d4a574] to-[#f0c987] transition-transform duration-300 scale-x-0 group-hover:scale-x-100 rounded-full"></span>
             </button>
             <div className="ml-2">
@@ -140,7 +129,7 @@ function Header({ loadingComplete = false }) {
                 <div className="bg-gradient-to-br from-[#04c8b0] to-[#03a088] p-2.5 rounded-xl shadow-lg">
                   <FileText size={18} />
                 </div>
-                <span>Regulamento</span>
+                <span>Regulamentos</span>
               </button>
               <Link
                 to="/consultar"

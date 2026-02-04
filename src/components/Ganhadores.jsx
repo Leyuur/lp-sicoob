@@ -33,7 +33,7 @@ function Ganhadores() {
       }
     } catch (err) {
       console.error('Erro ao buscar ganhadores:', err)
-      setError(err.message)
+      // Não seta erro, apenas deixa vazio para mostrar o empty state
       setGanhadores([])
     } finally {
       setLoading(false)
@@ -92,12 +92,11 @@ function Ganhadores() {
 
         {/* Empty State */}
         {!loading && !error && ganhadores.length === 0 && (
-          <div ref={contentRef} className={`bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center scroll-animate-scale ${contentVisible ? 'animate-in' : ''}`}>
-            <h3 className="text-gray-800 font-bold text-xl sm:text-2xl mb-3">Nenhum ganhador ainda foi contemplado</h3>
-            <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
-              Os sortudos ganhadores serão divulgados aqui após cada sorteio.
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-2xl sm:rounded-3xl p-8 sm:p-10 lg:p-12 text-center relative z-10">
+            <p className="text-gray-700 text-lg sm:text-xl lg:text-2xl leading-relaxed font-medium">
+              Os ganhadores da campanha serão divulgados aqui após a realização de cada sorteio.
               <br className="hidden sm:block" />
-              Continue participando e boa sorte! 🍀
+              <span className="text-[#0e5f5c] font-bold">Boa sorte a todos os participantes!</span> 🍀
             </p>
           </div>
         )}

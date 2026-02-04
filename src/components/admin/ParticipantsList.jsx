@@ -134,10 +134,13 @@ function ParticipantsList({ adminName, onNumeroClick }) {
     setShowingAll(false)
     
     try {
-      const response = await fetch('/server/admin/searchUser.php', {
+      // Remover pontuação do CPF/CNPJ
+      const cpfLimpo = searchTerm.replace(/\D/g, '')
+      
+      const response = await fetch('/server/admin/searchByCpf.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ searchTerm })
+        body: JSON.stringify({ cpf: cpfLimpo })
       })
 
       const data = await response.json()
@@ -234,23 +237,29 @@ function ParticipantsList({ adminName, onNumeroClick }) {
             <div>
               <h4 className="text-[#04c8b0] font-bold text-base mb-4">Números da Sorte ({selectedUser.numeros?.length || 0})</h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                {selectedUser.numeros?.map((item, index) => (
-                  <div 
-                    key={index} 
-                    className="bg-gray-900 rounded-lg px-4 py-4 border border-gray-700 hover:border-[#04c8b0] transition-all cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      if (onNumeroClick) {
-                        onNumeroClick(formatNumero(item.numero))
-                      }
-                    }}
-                  >
-                    <div className="text-center">
-                      <span className="text-white font-mono font-bold text-lg block mb-1">{formatNumero(item.numero)}</span>
-                      <span className="text-gray-400 text-xs block">{formatTipoSorteio(item.tipo)}</span>
+                {selectedUser.numeros?.map((item, index) => {
+                  // Verifica se item é string ou objeto
+                  const numero = typeof item === 'string' ? item : item.numero
+                  const tipo = typeof item === 'string' ? 'geral' : item.tipo
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className="bg-gray-900 rounded-lg px-4 py-4 border border-gray-700 hover:border-[#04c8b0] transition-all cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (onNumeroClick) {
+                          onNumeroClick(formatNumero(numero))
+                        }
+                      }}
+                    >
+                      <div className="text-center">
+                        <span className="text-white font-mono font-bold text-lg block mb-1">{formatNumero(numero)}</span>
+                        <span className="text-gray-400 text-xs block">{formatTipoSorteio(tipo)}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
 
@@ -329,7 +338,7 @@ function ParticipantsList({ adminName, onNumeroClick }) {
 
       {/* Resultado da busca individual */}
       {!loading && !showingAll && selectedUser && (
-        <ParticipantCard user={{ cpf: selectedUser.cpf, qtd_numeros: selectedUser.numeros?.length || 0 }} isExpanded={true} />
+        <ParticipantCard user={{ cpf: selectedUser.cpf, razao_social: selectedUser.razao_social, qtd_numeros: selectedUser.numeros?.length || 0 }} isExpanded={true} />
       )}
 
       {/* Lista de todos os participantes */}

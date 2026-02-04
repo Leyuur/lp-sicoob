@@ -64,7 +64,7 @@ try {
 
     // Inserir em ganhadores com status desclassificado
     $sqlInsert = "INSERT INTO ganhadores 
-                  (usuario_id, numero, tipo_sorteio, periodo_referencia, periodo_ano, data_indicacao, premiado_por, status, motivo_desclassificacao) 
+                  (usuario_id, numero, tipo_sorteio, periodo_referencia, periodo_ano, data_indicacao, indicado_por, status, motivo_desclassificacao) 
                   VALUES (?, ?, ?, ?, ?, ?, ?, 'desclassificado', ?)";
     
     $stmtInsert = $conn->prepare($sqlInsert);

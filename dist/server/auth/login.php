@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Busca usuário com CPF e data de nascimento
-        $sql = "SELECT id, name, cpf, data_nascimento FROM usuarios WHERE cpf = ? AND data_nascimento = ? LIMIT 1";
+        $sql = "SELECT id, razao_social, cpf, data_nascimento_abertura FROM usuarios WHERE cpf = ? AND data_nascimento_abertura = ? LIMIT 1";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $cpf, $dataNascimentoFormatted);
         $stmt->execute();
@@ -51,21 +51,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
             
-            // Busca números da sorte
-            $sqlNumbers = "SELECT numero FROM numeros WHERE usuario_id = ? ORDER BY created_at DESC";
-            $stmtNumbers = $conn->prepare($sqlNumbers);
-            $stmtNumbers->bind_param("i", $user['id']);
-            $stmtNumbers->execute();
-            $resultNumbers = $stmtNumbers->get_result();
+            // Busca números mensais
+            $sqlNumerosMensais = "SELECT numero, periodo_mes, periodo_ano FROM numeros_mensais WHERE usuario_id = ? ORDER BY numero";
+            $stmtMensais = $conn->prepare($sqlNumerosMensais);
+            $stmtMensais->bind_param("i", $user['id']);
+            $stmtMensais->execute();
+            $resultMensais = $stmtMensais->get_result();
             
             $numbers = [];
-            while ($row = $resultNumbers->fetch_assoc()) {
-                $numbers[] = $row['numero'];
+            while ($row = $resultMensais->fetch_assoc()) {
+                $numbers[] = [
+                    'numero' => $row['numero'],
+                    'tipo' => 'mensal',
+                    'periodo' => ucfirst($row['periodo_mes']),
+                    'ano' => $row['periodo_ano']
+                ];
+            }
+            
+            // Busca números periódicos
+            $sqlNumerosPeriodicos = "SELECT numero, periodo_tipo, periodo_ano FROM numeros_periodicos WHERE usuario_id = ? ORDER BY numero";
+            $stmtPeriodicos = $conn->prepare($sqlNumerosPeriodicos);
+            $stmtPeriodicos->bind_param("i", $user['id']);
+            $stmtPeriodicos->execute();
+            $resultPeriodicos = $stmtPeriodicos->get_result();
+            
+            while ($row = $resultPeriodicos->fetch_assoc()) {
+                // Mapear os tipos de período para nomes amigáveis
+                $periodoNome = $row['periodo_tipo'];
+                switch($row['periodo_tipo']) {
+                    case 'trimestre_1':
+                        $periodoNome = '1° Trimestre';
+                        break;
+                    case 'trimestre_2':
+                        $periodoNome = '2° Trimestre';
+                        break;
+                    case 'trimestre_3':
+                        $periodoNome = '3° Trimestre';
+                        break;
+                    case 'trimestre_4':
+                        $periodoNome = '4° Trimestre';
+                        break;
+                    case 'semestral':
+                        $periodoNome = 'Semestral';
+                        break;
+                    case 'anual':
+                        $periodoNome = 'Anual';
+                        break;
+                }
+                
+                $numbers[] = [
+                    'numero' => $row['numero'],
+                    'tipo' => 'periodico',
+                    'periodo' => $periodoNome,
+                    'ano' => $row['periodo_ano']
+                ];
             }
             
             echo json_encode([
                 'success' => true, 
-                'user' => $user,
+                'user' => [
+                    'name' => $user['razao_social'],
+                    'cpf' => $user['cpf']
+                ],
                 'numbers' => $numbers
             ]);
         } else {

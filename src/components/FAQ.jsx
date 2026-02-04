@@ -5,43 +5,103 @@ import { useScrollAnimation } from '../hooks/useScrollAnimation'
 const faqData = [
   {
     id: 1,
-    pergunta: 'Como faço para participar da campanha?',
-    resposta: 'Para participar da campanha, basta ser cliente Sicoob e realizar as ações promocionais descritas no regulamento. Cada ação qualificada gera números da sorte automaticamente.'
+    pergunta: 'Quem pode participar da promoção?',
+    resposta: 'Podem participar os cooperados do Sicoob Unique Br, pessoas físicas ou jurídicas, que realizarem integralizações de capital social durante o período da promoção, conforme as regras do regulamento. Pessoas físicas devem ser maiores de 18 anos e possuir CPF válido; Pessoas jurídicas devem possuir CNPJ ativo.'
   },
   {
     id: 2,
-    pergunta: 'Como consulto meus números da sorte?',
-    resposta: 'Você pode consultar seus números da sorte através da seção "Consultar Números" nesta página. Basta informar seu CPF/CNPJ e data de nascimento/abertura da empresa para ter acesso aos seus números.'
+    pergunta: 'Qual período de participação da promoção?',
+    resposta: 'A promoção acontece entre janeiro e dezembro de 2026, com diferentes períodos de participação, conforme cada sorteio (mensal, trimestral, semestral ou anual). Importante: somente as integralizações feitas dentro do período válido de cada sorteio são consideradas.'
   },
   {
     id: 3,
-    pergunta: 'Quantos números da sorte posso acumular?',
-    resposta: 'Não há limite para a quantidade de números da sorte que você pode acumular. Quanto mais você participar das ações promocionais, mais chances de ganhar você terá!'
+    pergunta: 'Onde a promoção é válida?',
+    resposta: 'A promoção é válida em todo o território nacional, exclusivamente para a cooperativa Sicoob Unique Br (cód. 4620), e as integralizações devem ser feitas por meio do gerente de relacionamento.'
   },
   {
     id: 4,
-    pergunta: 'Quando serão realizados os sorteios?',
-    resposta: 'As datas dos sorteios estão especificadas no regulamento da campanha. Fique atento ao nosso site e redes sociais para não perder nenhuma informação importante.'
+    pergunta: 'É necessário comprar algum produto para participar?',
+    resposta: 'Não. Para participar, o cooperado deve realizar integralizações de capital social, conforme os valores mínimos definidos no regulamento.'
   },
   {
     id: 5,
-    pergunta: 'Como saberei se fui sorteado?',
-    resposta: 'Os ganhadores serão contatados através dos dados cadastrados na cooperativa e também divulgados na seção "Ganhadores" deste site. Além disso, a lista oficial será publicada conforme descrito no regulamento.'
+    pergunta: 'Como faço para participar da promoção?',
+    resposta: 'É simples! Pessoa Física: A cada R$ 100,00 integralizados em capital social dentro do período válido do sorteio, você recebe 1 número da sorte. Pessoa Jurídica: A cada R$ 300,00 integralizados, você recebe 1 número da sorte. Os números da sorte são gerados automaticamente conforme o valor integralizado.'
   },
   {
     id: 6,
-    pergunta: 'Quais são os prêmios da campanha?',
-    resposta: 'Os prêmios disponíveis estão detalhados no regulamento oficial da campanha. Acesse a seção "Regulamento" para conferir todos os prêmios e condições.'
+    pergunta: 'Os valores integralizados são cumulativos?',
+    resposta: 'Sim, desde que estejam dentro do mesmo período de participação do sorteio. Valores que não atingirem o mínimo dentro de um período podem ser considerados para outras modalidades (como semestral ou anual), desde que ainda estejam dentro do período válido.'
   },
   {
     id: 7,
-    pergunta: 'Posso transferir meus números da sorte para outra pessoa?',
-    resposta: 'Não, os números da sorte são pessoais e intransferíveis. Eles estão vinculados ao CPF/CNPJ do participante que realizou as ações promocionais.'
+    pergunta: 'Posso participar de mais de um sorteio?',
+    resposta: 'Sim. O cooperado pode participar de mais de uma modalidade (mensal, trimestral, semestral ou anual), desde que cumpra os critérios de cada período. Porém, cada participante só pode ser ganhador uma vez na modalidade mensal e uma vez por modalidade periódica.'
   },
   {
     id: 8,
-    pergunta: 'Até quando posso participar da campanha?',
-    resposta: 'O período de participação está especificado no regulamento da campanha. Certifique-se de realizar suas ações dentro do prazo para garantir seus números da sorte.'
+    pergunta: 'Onde posso consultar meus números da sorte?',
+    resposta: 'Os números da sorte podem ser consultados no site oficial da promoção: https://capitalpremiadouniquebr.com.br. Basta informar CPF ou CNPJ e data de nascimento ou fundação.'
+  },
+  {
+    id: 9,
+    pergunta: 'O que acontece se eu resgatar o capital integralizado antes do sorteio?',
+    resposta: 'Se o cooperado resgatar os valores integralizados antes da entrega do prêmio, ele perde o direito de participar dos sorteios.'
+  },
+  {
+    id: 10,
+    pergunta: 'Quais são os prêmios da promoção?',
+    resposta: 'A promoção conta com diferentes prêmios, conforme cada sorteio, incluindo, por exemplo: Pontos Coopera, Motocicletas e Carros. Os prêmios variam de acordo com a data da apuração. Todas as informações detalhadas estão descritas nos regulamentos oficiais da promoção.'
+  },
+  {
+    id: 11,
+    pergunta: 'O que são Pontos Coopera e como resgatar?',
+    resposta: 'Os Pontos Coopera são créditos digitais utilizados como forma de premiação na modalidade mensal da promoção. Os pontos podem ser trocados por produtos Sicoob, viagens, eletrônicos, produtos de beleza, produtos para sua casa, entre outros. Os pontos ficam disponíveis na plataforma www.shopcoopera.com.br. Os Pontos Coopera possuem validade de 180 dias e não podem ser convertidos em dinheiro.'
+  },
+  {
+    id: 12,
+    pergunta: 'Como acontecem os sorteios?',
+    resposta: 'Os sorteios são realizados com base nos resultados da Loteria Federal, seguindo critérios técnicos definidos no regulamento. Caso a Loteria Federal não realize extração na data prevista, será considerada a extração subsequente.'
+  },
+  {
+    id: 13,
+    pergunta: 'Como saberei se fui ganhador?',
+    resposta: 'Os ganhadores serão divulgados no site: https://capitalpremiadouniquebr.com.br. Além disso, os ganhadores poderão ser comunicados por e-mail, telefone ou WhatsApp, em até 10 dias úteis após a apuração.'
+  },
+  {
+    id: 14,
+    pergunta: 'Como faço para receber meu prêmio?',
+    resposta: 'Após o contato da promotora, o ganhador deverá enviar, dentro do prazo informado: Documento de identificação (RG e CPF) e Comprovante de endereço. A entrega do prêmio ocorre sem qualquer custo, no prazo máximo de 30 dias após a apuração, conforme a modalidade do prêmio.'
+  },
+  {
+    id: 15,
+    pergunta: 'Os prêmios podem ser trocados por dinheiro?',
+    resposta: 'Não. A legislação brasileira não permite que prêmios de sorteios sejam convertidos em dinheiro.'
+  },
+  {
+    id: 16,
+    pergunta: 'E se eu não responder ou não enviar os documentos?',
+    resposta: 'Se o ganhador não atender aos prazos ou não enviar a documentação solicitada, perderá o direito ao prêmio, que será repassado ao suplente, conforme o regulamento.'
+  },
+  {
+    id: 17,
+    pergunta: 'Meus dados pessoais estão protegidos?',
+    resposta: 'Sim. Os dados são tratados exclusivamente para a realização da promoção, em conformidade com a Lei Geral de Proteção de Dados (LGPD).'
+  },
+  {
+    id: 18,
+    pergunta: 'Onde posso consultar os Regulamentos?',
+    resposta: 'No site: https://capitalpremiadouniquebr.com.br'
+  },
+  {
+    id: 19,
+    pergunta: 'Como posso cancelar a minha participação?',
+    resposta: 'A participação na promoção está vinculada à manutenção dos valores integralizados na Promoção Capital Premiado do Sicoob Unique Br. Para informações sobre cancelamento, entre em contato com seu gerente.'
+  },
+  {
+    id: 20,
+    pergunta: 'Tenho outras dúvidas sobre a promoção. O que devo fazer?',
+    resposta: 'Você pode entrar em contato pelos canais oficiais: 0800 777 4620 ou 4620capitalpremiado@sicoob.com.br. Atendimento de segunda a sexta-feira, das 8h às 17h.'
   }
 ]
 

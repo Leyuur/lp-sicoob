@@ -122,12 +122,14 @@ function ImportData({ adminName }) {
     if (!serial || isNaN(serial)) return ''
     
     // Excel armazena datas como número de dias desde 01/01/1900
-    const excelEpoch = new Date(1899, 11, 30) // 30 de dezembro de 1899
-    const date = new Date(excelEpoch.getTime() + serial * 86400000) // 86400000 ms = 1 dia
+    // Usar UTC para evitar problemas de timezone
+    const excelEpoch = Date.UTC(1899, 11, 30) // 30 de dezembro de 1899
+    const dateInMs = excelEpoch + serial * 86400000 // 86400000 ms = 1 dia
+    const date = new Date(dateInMs)
     
-    const dia = String(date.getDate()).padStart(2, '0')
-    const mes = String(date.getMonth() + 1).padStart(2, '0')
-    const ano = date.getFullYear()
+    const dia = String(date.getUTCDate()).padStart(2, '0')
+    const mes = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const ano = date.getUTCFullYear()
     
     return `${dia}/${mes}/${ano}`
   }

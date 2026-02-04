@@ -22,16 +22,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Lista de admins autorizados
     $admins = [
         [
-            'username' => 'crisduarte',
-            'password' => 'Cassol@2025',
-            'name' => 'Cristian Duarte (Dev)'
+            'username' => 'drtechs.dev',
+            'password' => 'DrtechsDevSicoob@2026#',
+            'name' => 'DRTechs Dev (Master)'
         ],
         [
-            'username' => 'yuriduarte',
-            'password' => 'Cassol@2025',
-            'name' => 'Yuri Duarte (Dev)'
+            'username' => 'vila.rica',
+            'password' => 'VilaRica.office@2026#',
+            'name' => 'Vila Rica'
+        ],
+        [
+            'username' => 'alex.rocha',
+            'password' => 'Q7@F!9$Lx#4A2Hk',
+            'name' => 'Alex Rocha'
+        ],
+        [
+            'username' => 'kelvin.matos',
+            'password' => 'M3@R!8$Wq#9Z5P',
+            'name' => 'Kelvin Matos'
+        ],
+        [
+            'username' => 'paulo.cesar',
+            'password' => 'K8@T!2$E7#N4mS',
+            'name' => 'Paulo Cesar'
         ],
     ];
+
 
     // Busca o admin na lista
     $adminEncontrado = null;

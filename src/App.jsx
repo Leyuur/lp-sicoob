@@ -24,7 +24,7 @@ function App() {
   }
 
   return (
-    <Router basename="/teste">
+    <Router basename="/">
       <div className="min-h-screen">
         <ToastContainer
           position="top-right"
